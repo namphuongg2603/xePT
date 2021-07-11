@@ -1,0 +1,162 @@
+<?php
+    require_once __DIR__ . "/autoload/autoload.php";
+    $data = [];
+    if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
+        $user = $_SESSION['user'];
+    } else {
+        header("localtion: index.php");
+    }
+
+    $error = [];
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+        if (postInput('c_password') == '' || $user['password'] != MD5(postInput("c_password"))) {
+            $error['c_password'] = "Thông tin mật khẩu không chính xác";
+        }
+
+        if (postInput('password') == '') {
+            $error['password'] = "Mật khẩu không được để trống";
+        }
+
+        if (postInput('r_password') == '') {
+            $error['r_password'] = "Nhập lại mật khẩu không được để trống";
+        }
+
+        if (postInput('password') != postInput('r_password')) {
+            $error['password'] = "Mật khẩu không trùng nhau";
+        }
+
+        $data['password'] = MD5(postInput("password"));
+
+        if (empty($error)) {
+
+            $id_update = $db->update("users", $data, array('id' => intval($user['id'])));
+            $is_check = $db->fetchOne("users", "id = '" . $user['id'] . "'");
+            $_SESSION['user'] = $is_check;
+            unset($_SESSION['name_user']);
+            unset($_SESSION['name_id']);
+            unset($_SESSION['user']);
+            $_SESSION['success'] = "Đổi mật khẩu thành công. Vui lòng login cập nhật thông tin";
+            return redirectStyle('dang-nhap.php');
+        }
+    }
+
+    $data = $db->fetchOne("users", "id = '" . $user['id'] . "'");
+?>
+<?php require_once __DIR__ . "/layouts/header.php"; ?>
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="menu-account">
+                    <h3>
+                        <span>
+                            Tài khoản
+                        </span>
+                    </h3>
+                    <ul>
+                        <li><a href="thong-tin-tai-khoan.php"><i class="fa fa-fw fa-user"> </i> Thông tin tài khoản</a></li>
+                        <li><a href="thong-tin-dat-xe.php"><i class="fa fa-fw fa-truck"> </i> Quản lý thông tin đặt xe</a></li>
+                        <li><a href="doi-mat-khau.php"><i class="fa fa-key"> </i>  Đổi mật khẩu </a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="breadcrumb clearfix">
+                    <ul>
+                        <li itemtype="" itemscope="" class="home">
+                            <a title="Đến trang chủ" href="index.php" itemprop="url"><span
+                                    itemprop="title">Trang chủ</span></a>
+                        </li>
+                        <li class="icon-li"><strong>Đổi mật khẩu</strong></li>
+                    </ul>
+                </div>
+                <script type="text/javascript">
+                    $(".link-site-more").hover(function () {
+                        $(this).find(".s-c-n").show();
+                    }, function () {
+                        $(this).find(".s-c-n").hide();
+                    });
+                </script>
+                <script src="public/frontend/app/services/accountServices.js"></script>
+                <script src="public/frontend/app/controllers/accountController.js"></script>
+                <div class="login-content clearfix" ng-controller="accountController" ng-init="initController()">
+                    <h1 class="title"><span>Đổi mật khẩu</span></h1>
+                    <div ng-if="IsError" class="alert alert-danger fade in">
+                        <button data-dismiss="alert" class="close"></button>
+                        <i class="fa-fw fa fa-times"></i>
+                        <strong>Error!</strong>
+                        <span ng-bind-html="Message"></span>
+                    </div>
+                    <div class="col-md-9 bor">
+                        <section class="box-main1">
+
+                            <?php if (isset($_SESSION['success'])): ?>
+                                <div class="alert alert-success">
+                                    <strong></strong> <?php echo $_SESSION['success'];
+                                    unset($_SESSION['success']) ?>
+                                </div>
+                            <?php endif ?>
+                            <?php if (isset($_SESSION['error'])): ?>
+                                <div class="alert alert-danger">
+                                    <strong>Lỗi! </strong><?php echo $_SESSION['error'];
+                                    unset($_SESSION['error']) ?>
+                                </div>
+                            <?php endif ?>
+                            <form action="" method="POST" class="form-horizontal formcustome" role="form"
+                                  style="margin-top: 20px">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-md-offset-1"> Mật khẩu cũ</label>
+                                    <div class="col-md-5">
+                                        <input type="password" name="c_password" placeholder="Mật khẩu cũ" class="form-control" >
+                                        <?php if (isset($error['c_password'])): ?>
+                                            <p class="text-danger"><?php echo $error['c_password'] ?></p>
+                                        <?php endif ?>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 col-md-offset-1"> Mật khẩu </label>
+                                    <div class="col-md-5">
+                                        <input type="password" name="password" placeholder="Mật khẩu mới" class="form-control" >
+                                        <?php if (isset($error['password'])): ?>
+                                            <p class="text-danger"><?php echo $error['password'] ?></p>
+                                        <?php endif ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 col-md-offset-1"> Mật khẩu </label>
+                                    <div class="col-md-5">
+                                        <input type="password" name="r_password" placeholder="Nhập lại mật khẩu" class="form-control" >
+                                        <?php if (isset($error['r_password'])): ?>
+                                            <p class="text-danger"><?php echo $error['r_password'] ?></p>
+                                        <?php endif ?>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success col-md-2 col-md-offset-4"
+                                        style="margin-top: 20px;"> Đổi mật khẩu
+                                </button>
+                            </form>
+                            <!-- Nội dung -->
+                        </section>
+                    </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!--hiển thị menu TRANG INDEX.PHP-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".menu-quick-select ul").hide();
+        $(".menu-quick-select").hover(function () {
+            $(".menu-quick-select ul").show();
+        }, function () {
+            $(".menu-quick-select ul").hide();
+        });
+    });
+</script>

@@ -1,0 +1,16 @@
+- tìm kiếm theo giá xe, danh mục xe
+-[x] trang liên hệ
+-trang tin tức
+- thêm, sửa , xóa xe và admin
+- Giỏ hàng
+
+- thồng báo xe nào đã đặt rồi thì ko thể đặt được
+ và mục chọn xe tự lái hay có tài xế khi tích vào nữa ạ
+
+
+
+Trong trang chi tiết xe có mục chọn có lái hoặc tự lái thì tiền tổng xe tự lái và có lái hiện ra dưới cho khách hàng biết ạ
+
+
+và chỗ giao diện chưa được đẹp lắm
+và chưa có thêm sản phẩm liên qquan khi khách hàng cần
